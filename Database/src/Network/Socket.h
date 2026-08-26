@@ -12,9 +12,11 @@ class Socket{
         Socket(std::string IP, uint16_t port);
         std::pair<std::string, bool> create();
         std::pair<std::string, bool> close();
-        std::pair<std::string, bool> receive(); 
-        bool send(const std::string& message, int clientDescriptor);
+        std::pair<std::string, bool> receive(int clientDescriptor); 
+        std::pair<std::string, bool> send(const std::string& message, int clientDescriptor);
+        int getDescriptor();
         virtual ~Socket();
+
 
 
 };
