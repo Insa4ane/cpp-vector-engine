@@ -2,3 +2,4 @@
 /Database/src/Network/*.o
 /Database/src/Network/klient
 /Database/src/Network/serwer
+/.vscode/
