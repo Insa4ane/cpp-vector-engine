@@ -1,1 +1,1 @@
-VECTOR_SIZE=3
+PATH="./cache_folder"

@@ -1,19 +1,13 @@
-from config.config import VECTOR_SIZE
+from config.config import PATH
+from sentence_transformers import SentenceTransformer
 
 class VectorAgent():
-
     def __init__(self):
-        self.vector_size=VECTOR_SIZE;
+        self.model=SentenceTransformer('all-MiniLM-L6-v2', cache_folder=PATH)
     
-    def text_to_vector(self, text):
-        pass
-
-    def distance(self, vector, data):
-        pass;
+    def text_to_vector(self, text: str)->list[float]:
+        vector=self.model.encode(text)
+        return vector.tolist()
 
 
-
-
-    
-    
     
