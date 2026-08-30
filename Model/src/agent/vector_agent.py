@@ -5,12 +5,11 @@ class VectorAgent():
     def __init__(self):
         self.vector_size=VECTOR_SIZE;
     
-    def text_to_vector(self):
+    def text_to_vector(self, text):
         pass
 
-    def vector_to_text(self):
-        pass
-
+    def distance(self, vector, data):
+        pass;
 
 
 
