@@ -7,7 +7,8 @@
 #include <pybind11/stl.h>
 #include <cmath>
 #include <algorithm>
-
+#include <pybind11/embed.h>
+namespace py = pybind11;
 
 struct Record{
     int id;

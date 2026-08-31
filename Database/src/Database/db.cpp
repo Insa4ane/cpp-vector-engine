@@ -5,8 +5,8 @@ namespace py=pybind11;
 Database::Database(std::string name) : name(name), recordID(0) {
     try{
         py::module_ sys = py::module_::import("sys"); 
-        sys.attr("path").attr("append")("./Model/src/agent");
-        py::module_ agent_module = py::module_::import("agent");
+        sys.attr("path").attr("append")("../../../Model/src");
+        py::module_ agent_module = py::module_::import("agent.vector_agent");
 
         py::object agent_class = agent_module.attr("VectorAgent");
         ai_agent = agent_class();
@@ -22,7 +22,8 @@ std::pair<std::string, bool> Database::insert(const Record& record) {
     copy_record.id=recordID;
 
     try {
-        std::string text_for_ai = copy_record.language + " " + std::to_string(copy_record.exp);
+        std::string text_for_ai = "Programmer specialized in " + record.language + 
+                          " with " + std::to_string(record.exp) + " months of work experience";
         std::vector<float> embedding = ai_agent.attr("text_to_vector")(text_for_ai).cast<std::vector<float>>();
 
         copy_record.vector = embedding; 
@@ -45,19 +46,30 @@ std::pair<std::vector<std::string>, bool> Database::split_data(std::string& desc
     while(std::getline(stream, result, ',')){
         results.push_back(result);
     }
-    if(results.size()!=Record::EXPECTED_FIELDS){
-        return {{"Error!,Its,Imposible,to,split,data"}, false};
-    }
 
-    return{results, true};
+    return{results, !results.empty()};
 }
 
 std::pair<Record, bool> Database::vector_to_record(std::vector<std::string>&data){
     Record record;
     try{
-        record.worker=data[0];
-        record.language=data[1];
-        record.exp=std::stoi(data[2]);
+        if(data.size()==Record::EXPECTED_FIELDS){
+            record.worker=data[0];
+            record.language=data[1];
+            std::string exp_str = data[2];
+            exp_str.erase(std::remove_if(exp_str.begin(), exp_str.end(), ::isspace), exp_str.end());
+            record.exp = std::stoi(exp_str);
+        }
+        else if(data.size()==Record::EXPECTED_FIELDS-1){ 
+            record.worker = "Wanted";
+            record.language = data[0];
+            std::string exp_str = data[1];
+            exp_str.erase(std::remove_if(exp_str.begin(), exp_str.end(), ::isspace), exp_str.end());
+            record.exp = std::stoi(exp_str);
+        }
+        else{
+            return{record, false};
+        }
     }
     catch(const std::exception& e){
         return {record, false};
@@ -72,15 +84,15 @@ std::pair<std::vector<Record>, bool> Database::search(const Record& record){
     }
     std::vector<Record> results;
     for(const auto& [id, rec]:data){
-        if(rec.language==record.language){
+        if(rec.language==record.language && rec.exp==record.exp && rec.worker==record.worker){
             results.push_back(rec);
         }
     }
         if(results.size()==0){
             try{
-                std::string text_to_ai=record.language+" "+std::to_string(record.exp);
-                std::vector<float> query_vector=ai_agent.attr("text_to_vector")(text_to_ai).cast<std::vector<float>>();
-                ///nastepnie potrzebne bedzie napisac logike tych wektorow
+                std::string text_for_ai = "Programmer specialized in " + record.language + 
+                          " with " + std::to_string(record.exp) + " months of work experience.";
+                std::vector<float> query_vector=ai_agent.attr("text_to_vector")(text_for_ai).cast<std::vector<float>>();
                 std::vector<std::pair<double,Record>> distances;
                 for(const auto& [id, rec]:data){
                     std::pair<double, bool> distance=cosine_similarity(query_vector, rec.vector);
