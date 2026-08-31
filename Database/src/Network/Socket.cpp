@@ -41,7 +41,7 @@ std::pair<std::string, bool> Socket::receive(int clientSocket){
     if (clientSocket<0){
         return {"Error! We cannor receive data from the client", false};
     }
-    char buffer[4096];
+    char buffer[4096]={0};
     
     ssize_t bytesReceive=::recv(clientSocket, buffer, sizeof(buffer)-1, 0);
 
@@ -51,7 +51,7 @@ std::pair<std::string, bool> Socket::receive(int clientSocket){
     else if(bytesReceive==0){
         return {"The other side close a connect", false};
     }
-    return{"Success! We receive a data: "+std::string(buffer), true};
+    return {std::string(buffer), true};
 }
 
 int Socket::getDescriptor(){

@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Server.h"
-#include "../../Database/db.h" 
+#include "../../Database/db.h"
 #include <pybind11/embed.h>
 
 namespace py=pybind11;
@@ -26,25 +26,42 @@ int main() {
                 std::string command;
                 std::string pure_data;
                 ss>>command>>pure_data;
-                if(command=="ADD"){
-                    std::pair<std::vector<std::string>, bool> written_data=db.split_data(pure_data);
-                    if(written_data.second){
-                    std::pair<Record, bool> record=db.vector_to_record(written_data.first);
-                        if(record.second){
-                            std::pair<std::string, bool> result=db.insert(record.first);
-                            serverResponse=result.first;
-                        }
-                        else{
-                            serverResponse="Error! Invalid data types in record";
-                        }
-                    }
-                    else{
-                        serverResponse="Error! We cannot to split data on vector";
-                    }
-                }   
-                else if(command=="GET"){
-                    
+                if (command == "STOP") {
+                    serverActive = false;
+                    serverResponse = "Success! Server is shutting down.";
                 }
+                std::pair<std::vector<std::string>, bool> written_data=db.split_data(pure_data);
+                 if(written_data.second){
+                     std::pair<Record, bool> record=db.vector_to_record(written_data.first);
+                     if(record.second){
+                        if(command=="ADD"){
+                            std::pair<std::string, bool> results=db.insert(record.first);
+                            serverResponse=results.first;
+                        }
+                        else if(command=="GET"){
+                            std::pair<std::vector<Record>, bool> results=db.search(record.first);
+                            if(results.second){
+                                serverResponse="Success! Here is your reponse:\n";
+                                for(const Record& result: results.first){
+                                serverResponse += "- " + result.worker + " | " 
+                                                    + result.language + " | " 
+                                                    + std::to_string(result.exp) + " months\n";
+                                }
+
+                            }
+                            else{
+                                serverResponse="Error! Search failed or no results found.";
+                            }
+                        }
+                     }
+                     else{
+                        serverResponse="Error! We cannot vector to record";
+                     }
+                 }
+                 else{
+                    serverResponse="Error! We cannot split data";
+                 }
+
                 
                 server.send(serverResponse, clientDesc);
             }
