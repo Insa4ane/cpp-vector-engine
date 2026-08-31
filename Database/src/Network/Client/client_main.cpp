@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Client.h"
+#include <string>
 
 int main() {
     Client client("127.0.0.1", 8080); 
@@ -9,9 +10,9 @@ int main() {
     
     if (success) {
         std::cout << "Connected with server!" << std::endl;
-        
-        client.send("Hi! Here is your first client", client.getDescriptor());
-        
+        std::string message;
+        std::getline(std::cin, message); 
+        if (!message.empty()) client.send(message, client.getDescriptor());
         auto [reply, recvSuccess] = client.receive(client.getDescriptor());
         if (recvSuccess) {
             std::cout << "Server response: " << reply << std::endl;

@@ -3,3 +3,6 @@
 /Database/src/Network/klient
 /Database/src/Network/serwer
 /.vscode/
+/Model/src/cache_folder
+/Model/src/agent/__pycache__/
+/Model/src/config/__pycache__/
