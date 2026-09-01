@@ -29,19 +29,19 @@ The entire environment is containerized. You don't need to install Python, C++ c
 
 ## Usage Examples
 Once connected via the client, you can add records and query the vector database:
-    ```bash
-    ADD Jacek,C++,10
-    ADD Anna,C++,55
-    ADD Kasia,C++,40
-    ```
+```bash
+ADD Jacek,C++,10
+ADD Anna,C++,55
+ADD Kasia,C++,40
+```
 
 Perform a semantic search (e.g., looking for a mid/senior C++ dev)
-    ```bash
-    GET C++,50
-    ```
+```bash
+GET C++,50
+```
 
 STOP the client
-    ```bash
-    STOP
-    ```
+```bash
+STOP
+```
 
